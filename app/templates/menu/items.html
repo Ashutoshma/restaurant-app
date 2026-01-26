@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}{{ restaurant.name }} - Menu{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1 class="mb-2">{{ restaurant.name }}</h1>
+        <p class="text-muted">{{ restaurant.description }}</p>
+        <a href="{{ url_for('restaurants.detail', restaurant_id=restaurant.id) }}" class="btn btn-secondary btn-sm">
+            &larr; Back to Restaurant
+        </a>
+    </div>
+</div>
+
+<!-- Menu Items by Category -->
+<div class="row">
+    <div class="col-md-9">
+        {% if items_by_category %}
+            {% for category, items in items_by_category.items() %}
+                <div class="mb-5">
+                    <h2 class="mb-4 border-bottom pb-2">{{ category }}</h2>
+                    
+                    <div class="row">
+                        {% for item in items %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card menu-item-card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ item.name }}</h5>
+                                        <p class="card-text text-muted">{{ item.description or 'No description' }}</p>
+                                        
+                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                            <span class="h5 mb-0 text-primary">${{ "%.2f"|format(item.price) }}</span>
+                                            
+                                            <div class="input-group" style="width: 120px;">
+                                                <button class="btn btn-outline-secondary btn-sm" type="button" 
+                                                        onclick="decreaseQty(this)">−</button>
+                                                <input type="number" class="form-control text-center item-qty" 
+                                                       value="1" min="1" style="width: 40px;">
+                                                <button class="btn btn-outline-secondary btn-sm" type="button" 
+                                                        onclick="increaseQty(this)">+</button>
+                                            </div>
+                                        </div>
+                                        
+                                        <button class="btn btn-primary w-100 mt-3" type="button"
+                                                onclick="addToCart({{ restaurant.id }}, '{{ item.id }}', '{{ item.name }}', {{ item.price }}, this)">
+                                            Add to Cart
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <h4 class="alert-heading">No Menu Items Available</h4>
+                <p>This restaurant doesn't have any menu items available at the moment.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar - Cart Summary -->
+    <div class="col-md-3">
+        <div class="card sticky-top" style="top: 20px;">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">🛒 Cart</h5>
+            </div>
+            <div class="card-body">
+                <div id="cart-summary" class="mb-3">
+                    <p class="text-muted" id="empty-cart-msg">Your cart is empty</p>
+                    <div id="cart-items" style="display: none;">
+                        <div id="cart-item-list"></div>
+                        <hr>
+                        <p class="mb-0">
+                            <strong>Total:</strong> 
+                            <span id="cart-total" class="float-end">$0.00</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <a href="{{ url_for('cart.view_cart') }}" class="btn btn-primary w-100 mb-2">View Cart</a>
+                {% if all_items %}
+                    <a href="{{ url_for('orders.create') }}" class="btn btn-success w-100">Checkout</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.menu-item-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.menu-item-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.input-group {
+    display: flex;
+}
+
+.item-qty {
+    border-left: none;
+    border-right: none;
+}
+</style>
+
+<script>
+function addToCart(restaurantId, itemId, itemName, itemPrice, button) {
+    const qtyInput = button.previousElementSibling.previousElementSibling.previousElementSibling;
+    const quantity = parseInt(qtyInput.value) || 1;
+    
+    fetch('/cart/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            restaurant_id: restaurantId,
+            item_id: itemId,
+            name: itemName,
+            price: itemPrice,
+            quantity: quantity
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateCartDisplay();
+            showCartNotification(itemName);
+        } else {
+            alert('Error adding item to cart');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function increaseQty(button) {
+    const input = button.previousElementSibling;
+    input.value = (parseInt(input.value) || 1) + 1;
+}
+
+function decreaseQty(button) {
+    const input = button.nextElementSibling;
+    if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+    }
+}
+
+function updateCartDisplay() {
+    fetch('/cart', {
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.text())
+    .then(html => {
+        // Parse cart data from response
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Update cart count
+        const cartTotal = doc.querySelector('#cart-total');
+        if (cartTotal) {
+            document.querySelector('#cart-total').textContent = cartTotal.textContent;
+        }
+    });
+}
+
+function showCartNotification(itemName) {
+    // Show a simple toast-like message
+    const emptyMsg = document.getElementById('empty-cart-msg');
+    const cartItems = document.getElementById('cart-items');
+    
+    if (emptyMsg) emptyMsg.style.display = 'none';
+    if (cartItems) cartItems.style.display = 'block';
+    
+    // Show alert
+    alert(itemName + ' added to cart!');
+}
+</script>
+{% endblock %}
