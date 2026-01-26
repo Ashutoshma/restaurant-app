@@ -26,6 +26,15 @@
                             <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('restaurants.list_restaurants') }}">Browse</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('cart.view_cart') }}">🛒 Cart</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('orders.list_orders') }}">Orders</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
                         </li>
                     {% else %}
