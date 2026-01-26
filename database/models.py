@@ -39,6 +39,7 @@ class User(Base, UserMixin):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = Column(Boolean, default=True)
+    is_admin = Column(Boolean, default=False)
     
     # Relationships
     orders = relationship('Order', back_populates='user', cascade='all, delete-orphan')
