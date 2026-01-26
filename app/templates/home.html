@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Restaurant Ordering App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="jumbotron">
+            <h1 class="display-4">Welcome to Restaurant Ordering</h1>
+            <p class="lead">Discover and order from your favorite restaurants</p>
+            <hr class="my-4">
+            <p>You are logged in as <strong>{{ current_user.username }}</strong></p>
+            <a class="btn btn-primary btn-lg" href="#" role="button">Browse Restaurants</a>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Recent Orders</h5>
+                        <p class="card-text">View your order history</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Saved Restaurants</h5>
+                        <p class="card-text">Your favorite places to eat</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">My Account</h5>
+                        <p class="card-text">Manage your profile</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

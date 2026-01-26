@@ -71,8 +71,14 @@ class PostgresDB:
 # Global database instance
 db = PostgresDB()
 
-def init_db(app):
-    """Initialize database with Flask app"""
+# Export SessionLocal for convenient import
+SessionLocal = db.SessionLocal
+
+def init_db(database_url=None):
+    """Initialize database (create tables)"""
+    if database_url:
+        global db
+        db = PostgresDB(database_url)
     db.create_tables()
 
 if __name__ == '__main__':

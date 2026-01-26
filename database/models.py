@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, Float, Text, Boolean, ForeignKey, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from flask_login import UserMixin
 import enum
 
 Base = declarative_base()
@@ -21,7 +22,8 @@ class PaymentStatus(enum.Enum):
     FAILED = 'failed'
     REFUNDED = 'refunded'
 
-class User(Base):
+class User(Base, UserMixin):
+    """User model with Flask-Login compatibility"""
     __tablename__ = 'users'
     
     id = Column(Integer, primary_key=True)
