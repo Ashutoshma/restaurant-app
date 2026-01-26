@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Review {{ restaurant.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="mb-4">
+            <a href="{{ url_for('restaurants.detail', restaurant_id=restaurant.id) }}" class="btn btn-secondary btn-sm">
+                &larr; Back to {{ restaurant.name }}
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h2 class="mb-4">Write a Review</h2>
+                <h5 class="mb-4 text-muted">{{ restaurant.name }}</h5>
+
+                <form method="POST" class="form">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-4">
+                        {{ form.rating.label }}
+                        <div class="input-group">
+                            {% if form.rating.errors %}
+                                {{ form.rating(class="form-control is-invalid") }}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.rating.errors %}
+                                        {{ error }}<br>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.rating(class="form-control") }}
+                            {% endif %}
+                            <span class="input-group-text">⭐ out of 5</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.text.label }}
+                        {% if form.text.errors %}
+                            {{ form.text(class="form-control is-invalid") }}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.text.errors %}
+                                    {{ error }}<br>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.text(class="form-control") }}
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            10-500 characters. Be honest and constructive.
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.submit() }}
+                        <a href="{{ url_for('restaurants.detail', restaurant_id=restaurant.id) }}" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
