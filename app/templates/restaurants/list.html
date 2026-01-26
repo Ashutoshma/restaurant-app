@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Restaurants{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1 class="mb-4">Browse Restaurants</h1>
+        
+        <!-- Filter and Search Section -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="search" class="form-label">Search Restaurants</label>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               placeholder="Search by name..." value="{{ selected_search or '' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="city" class="form-label">Filter by City</label>
+                        <select class="form-select" id="city" name="city">
+                            <option value="">All Cities</option>
+                            {% for c in cities %}
+                                <option value="{{ c }}" {% if selected_city == c %}selected{% endif %}>{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                        <a href="{{ url_for('restaurants.list_restaurants') }}" class="btn btn-secondary">Clear Filters</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Restaurants Grid -->
+<div class="row">
+    {% if restaurants %}
+        {% for restaurant in restaurants %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 restaurant-card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ restaurant.name }}</h5>
+                        <p class="card-text text-muted">{{ restaurant.description }}</p>
+                        
+                        <div class="restaurant-info mb-3">
+                            {% if restaurant.city %}
+                                <small class="d-block"><strong>📍 Location:</strong> {{ restaurant.city }}, {{ restaurant.address or 'N/A' }}</small>
+                            {% endif %}
+                            {% if restaurant.phone %}
+                                <small class="d-block"><strong>📞 Phone:</strong> {{ restaurant.phone }}</small>
+                            {% endif %}
+                        </div>
+                        
+                        <a href="{{ url_for('restaurants.detail', restaurant_id=restaurant.id) }}" 
+                           class="btn btn-outline-primary btn-sm me-2">View Details</a>
+                        <a href="{{ url_for('menu.restaurant_menu', restaurant_id=restaurant.id) }}" 
+                           class="btn btn-primary btn-sm">View Menu</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                <h4 class="alert-heading">No Restaurants Found</h4>
+                <p>No restaurants match your search criteria. Try adjusting your filters.</p>
+                <a href="{{ url_for('restaurants.list_restaurants') }}" class="btn btn-primary">View All Restaurants</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.restaurant-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.restaurant-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.restaurant-info {
+    font-size: 0.9rem;
+    color: #666;
+}
+</style>
+{% endblock %}
