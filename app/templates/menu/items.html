@@ -69,15 +69,33 @@
             </div>
             <div class="card-body">
                 <div id="cart-summary" class="mb-3">
-                    <p class="text-muted" id="empty-cart-msg">Your cart is empty</p>
-                    <div id="cart-items" style="display: none;">
-                        <div id="cart-item-list"></div>
-                        <hr>
-                        <p class="mb-0">
-                            <strong>Total:</strong> 
-                            <span id="cart-total" class="float-end">$0.00</span>
-                        </p>
-                    </div>
+                    {% if cart_items %}
+                        <div id="cart-items">
+                            <div id="cart-item-list">
+                                {% for item in cart_items %}
+                                    <div class="mb-2">
+                                        <small>{{ item.name }} ×{{ item.quantity }}</small><br>
+                                        <small class="text-muted">${{ "%.2f"|format(item.price * item.quantity) }}</small>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <hr>
+                            <p class="mb-0">
+                                <strong>Total:</strong> 
+                                <span id="cart-total" class="float-end">${{ "%.2f"|format(cart_total) }}</span>
+                            </p>
+                        </div>
+                    {% else %}
+                        <p class="text-muted" id="empty-cart-msg">Your cart is empty</p>
+                        <div id="cart-items" style="display: none;">
+                            <div id="cart-item-list"></div>
+                            <hr>
+                            <p class="mb-0">
+                                <strong>Total:</strong> 
+                                <span id="cart-total" class="float-end">$0.00</span>
+                            </p>
+                        </div>
+                    {% endif %}
                 </div>
                 
                 <a href="{{ url_for('cart.view_cart') }}" class="btn btn-primary w-100 mb-2">View Cart</a>
@@ -152,23 +170,30 @@ function decreaseQty(button) {
 }
 
 function updateCartDisplay() {
-    fetch('/cart', {
-        headers: {
-            'Accept': 'application/json'
+    // Fetch updated cart data from API
+    fetch('/cart/data')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const { item_count, grand_total } = data;
+            
+            // Update cart total
+            const cartTotal = document.querySelector('#cart-total');
+            if (cartTotal) {
+                cartTotal.textContent = '$' + grand_total.toFixed(2);
+            }
+            
+            // Show cart summary and hide empty message
+            const emptyMsg = document.getElementById('empty-cart-msg');
+            const cartItems = document.getElementById('cart-items');
+            
+            if (item_count > 0) {
+                if (emptyMsg) emptyMsg.style.display = 'none';
+                if (cartItems) cartItems.style.display = 'block';
+            }
         }
     })
-    .then(response => response.text())
-    .then(html => {
-        // Parse cart data from response
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        
-        // Update cart count
-        const cartTotal = doc.querySelector('#cart-total');
-        if (cartTotal) {
-            document.querySelector('#cart-total').textContent = cartTotal.textContent;
-        }
-    });
+    .catch(error => console.error('Error updating cart display:', error));
 }
 
 function showCartNotification(itemName) {

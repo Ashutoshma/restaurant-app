@@ -37,21 +37,6 @@
                     </div>
                     
                     <div class="mb-3">
-                        {{ form.special_instructions.label }}
-                        {% if form.special_instructions.errors %}
-                            {{ form.special_instructions(class="form-control is-invalid") }}
-                            <div class="invalid-feedback d-block">
-                                {% for error in form.special_instructions.errors %}
-                                    <span>{{ error }}</span><br>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form.special_instructions(class="form-control") }}
-                        {% endif %}
-                        <small class="form-text text-muted">E.g., allergies, dietary restrictions, preferences</small>
-                    </div>
-                    
-                    <div class="mb-3">
                         {{ form.notes.label }}
                         {% if form.notes.errors %}
                             {{ form.notes(class="form-control is-invalid") }}
@@ -63,7 +48,7 @@
                         {% else %}
                             {{ form.notes(class="form-control") }}
                         {% endif %}
-                        <small class="form-text text-muted">Any additional notes about your order</small>
+                        <small class="form-text text-muted">E.g., allergies, dietary restrictions, preferences, or any other notes about your order</small>
                     </div>
                     
                     <div class="mt-4">

@@ -1,5 +1,5 @@
 """Menu and menu items routes"""
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, session as flask_session
 from flask_login import login_required
 from database.postgres import SessionLocal
 from database.models import Restaurant
@@ -44,11 +44,24 @@ def restaurant_menu(restaurant_id):
                 items_by_category[category] = []
             items_by_category[category].append(item)
         
+        # Get current cart data
+        cart = flask_session.get('cart', {})
+        cart_items = []
+        cart_total = 0
+        
+        # If items from this restaurant exist in cart, build the display
+        restaurant_id_str = str(restaurant_id)
+        if restaurant_id_str in cart:
+            cart_items = cart[restaurant_id_str].get('items', [])
+            cart_total = cart[restaurant_id_str].get('total', 0)
+        
         return render_template(
             'menu/items.html',
             restaurant=restaurant,
             items_by_category=items_by_category,
-            all_items=menu_items
+            all_items=menu_items,
+            cart_items=cart_items,
+            cart_total=cart_total
         )
     
     finally:

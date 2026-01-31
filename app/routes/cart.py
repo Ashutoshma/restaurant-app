@@ -73,8 +73,10 @@ def view_cart():
                 total = calculate_cart_total(items)
                 grand_total += total
                 
+                # Don't include the SQLAlchemy object, convert to dict
                 cart_data.append({
-                    'restaurant': restaurant,
+                    'restaurant_id': restaurant.id,
+                    'restaurant_name': restaurant.name,
                     'items': items,
                     'total': total
                 })
@@ -281,3 +283,45 @@ def clear_cart():
         'success': True,
         'message': 'Cart cleared'
     })
+
+
+@bp.route('/data', methods=['GET'])
+@login_required
+def get_cart_data():
+    """
+    Get cart data as JSON (for AJAX updates).
+    
+    Returns:
+        JSON with cart items, counts, and totals
+    """
+    cart = get_cart()
+    session = SessionLocal()
+    try:
+        cart_data = []
+        grand_total = 0
+        
+        for restaurant_id_str, restaurant_cart in cart.items():
+            restaurant_id = int(restaurant_id_str)
+            restaurant = session.query(Restaurant).filter_by(id=restaurant_id).first()
+            
+            if restaurant:
+                items = restaurant_cart.get('items', [])
+                total = calculate_cart_total(items)
+                grand_total += total
+                
+                cart_data.append({
+                    'restaurant_id': restaurant.id,
+                    'restaurant_name': restaurant.name,
+                    'items': items,
+                    'total': total
+                })
+        
+        return jsonify({
+            'success': True,
+            'cart_data': cart_data,
+            'grand_total': round(grand_total, 2),
+            'item_count': sum(len(rc.get('items', [])) for rc in cart.values())
+        })
+    
+    finally:
+        session.close()

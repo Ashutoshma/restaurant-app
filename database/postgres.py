@@ -68,21 +68,42 @@ class PostgresDB:
         finally:
             session.close()
 
-# Global database instance
-db = PostgresDB()
+# Global database instance - initialized lazily
+_db_instance = None
 
-# Export SessionLocal for convenient import
-SessionLocal = db.SessionLocal
+def _get_db():
+    """Get or create global database instance with correct config"""
+    global _db_instance
+    if _db_instance is None:
+        from config import config
+        import os
+        
+        config_name = os.environ.get('FLASK_ENV', 'development')
+        flask_config = config.get(config_name, config['development'])
+        database_url = flask_config.SQLALCHEMY_DATABASE_URI
+        _db_instance = PostgresDB(database_url)
+    return _db_instance
+
+class _DBProxy:
+    """Proxy to lazy-load the database instance"""
+    def __getattr__(self, name):
+        return getattr(_get_db(), name)
+
+db = _DBProxy()
+
+def SessionLocal():
+    """Get a new database session"""
+    return _get_db().SessionLocal()
 
 def init_db(database_url=None):
     """Initialize database (create tables)"""
     if database_url:
-        global db
-        db = PostgresDB(database_url)
-    db.create_tables()
+        global _db_instance
+        _db_instance = PostgresDB(database_url)
+    _get_db().create_tables()
 
 if __name__ == '__main__':
     # For manual initialization
-    db.create_tables()
-    db.seed_data()
+    _get_db().create_tables()
+    _get_db().seed_data()
     print("Database initialized successfully!")

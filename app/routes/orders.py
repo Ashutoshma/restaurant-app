@@ -106,9 +106,10 @@ def create():
         flash('You can only order from one restaurant at a time.', 'error')
         return redirect(url_for('cart.view_cart'))
     
-    restaurant_id = int(list(cart.keys())[0])
-    cart_items = cart[restaurant_id]['items']
-    cart_total = cart[restaurant_id]['total']
+    restaurant_id_str = list(cart.keys())[0]
+    restaurant_id = int(restaurant_id_str)
+    cart_items = cart[restaurant_id_str]['items']
+    cart_total = cart[restaurant_id_str]['total']
     
     session = SessionLocal()
     try:
@@ -131,7 +132,6 @@ def create():
                     restaurant_id=restaurant_id,
                     total_price=cart_total,
                     delivery_address=form.delivery_address.data,
-                    special_instructions=form.special_instructions.data,
                     notes=form.notes.data,
                     status=OrderStatus.PENDING
                 )

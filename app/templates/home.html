@@ -10,7 +10,7 @@
             <p class="lead">Discover and order from your favorite restaurants</p>
             <hr class="my-4">
             <p>You are logged in as <strong>{{ current_user.username }}</strong></p>
-            <a class="btn btn-primary btn-lg" href="#" role="button">Browse Restaurants</a>
+            <a class="btn btn-primary btn-lg" href="{{ url_for('restaurants.list_restaurants') }}" role="button">Browse Restaurants</a>
         </div>
 
         <div class="row mt-5">

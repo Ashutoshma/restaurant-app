@@ -1,6 +1,10 @@
 """Configuration for different environments"""
 import os
 from datetime import timedelta
+from pathlib import Path
+
+# Get the app root directory
+APP_ROOT = Path(__file__).parent
 
 class Config:
     """Base configuration"""
@@ -19,8 +23,9 @@ class DevelopmentConfig(Config):
     DEBUG = True
     TESTING = False
     SQLALCHEMY_ECHO = True
+    # Use PostgreSQL for development
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'postgresql://postgres:password@localhost:5432/restaurant_app'
+        'postgresql://postgres@localhost:5432/restaurant_app'
     SESSION_COOKIE_SECURE = False
 
 class TestingConfig(Config):

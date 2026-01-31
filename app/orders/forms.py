@@ -12,16 +12,10 @@ class OrderForm(FlaskForm):
         render_kw={'class': 'form-control', 'placeholder': 'Enter your delivery address'}
     )
     
-    special_instructions = TextAreaField(
-        'Special Instructions (Optional)',
-        validators=[Optional(), Length(max=500)],
-        render_kw={'class': 'form-control', 'placeholder': 'Any special requests or allergies?', 'rows': 3}
-    )
-    
     notes = TextAreaField(
-        'Order Notes (Optional)',
+        'Special Instructions & Notes (Optional)',
         validators=[Optional(), Length(max=500)],
-        render_kw={'class': 'form-control', 'placeholder': 'Additional notes about your order', 'rows': 2}
+        render_kw={'class': 'form-control', 'placeholder': 'Any special requests, allergies, or additional notes?', 'rows': 3}
     )
     
     submit = SubmitField('Place Order', render_kw={'class': 'btn btn-primary btn-lg w-100'})

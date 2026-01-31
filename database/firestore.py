@@ -61,6 +61,25 @@ class FirestoreDB:
             print(f"Error fetching menu items: {e}")
             return self._get_mock_menu_items(restaurant_id)
     
+    def add_menu_item(self, restaurant_id, item_data):
+        """Add a menu item to Firestore"""
+        if not self.initialized:
+            return True  # Mock success for development
+        
+        try:
+            self.db.collection('menu_items').add({
+                'restaurant_id': restaurant_id,
+                'name': item_data.get('name'),
+                'category': item_data.get('category'),
+                'price': item_data.get('price'),
+                'description': item_data.get('description'),
+                'created_at': __import__('firebase_admin').firestore.SERVER_TIMESTAMP
+            })
+            return True
+        except Exception as e:
+            print(f"Error adding menu item: {e}")
+            return False
+    
     def add_review(self, restaurant_id, user_id, review_data):
         """Add review to restaurant"""
         if not self.initialized:
