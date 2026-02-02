@@ -21,6 +21,16 @@ def admin_required(f):
     return decorated_function
 
 
+@bp.route('/', methods=['GET'])
+@login_required
+@admin_required
+def dashboard():
+    """
+    Admin dashboard root route (redirects to orders).
+    """
+    return redirect(url_for('admin.orders_dashboard'))
+
+
 @bp.route('/orders', methods=['GET'])
 @login_required
 @admin_required
