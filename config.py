@@ -14,6 +14,7 @@ class Config:
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
+    WTF_CSRF_ENABLED = True
     
     # Logging
     LOG_LEVEL = 'INFO'
@@ -23,10 +24,11 @@ class DevelopmentConfig(Config):
     DEBUG = True
     TESTING = False
     SQLALCHEMY_ECHO = True
-    # Use PostgreSQL for development
+    # Use PostgreSQL for development, fallback to SQLite
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'postgresql://postgres@localhost:5432/restaurant_app'
     SESSION_COOKIE_SECURE = False
+    WTF_CSRF_ENABLED = True
 
 class TestingConfig(Config):
     """Testing configuration"""
@@ -40,11 +42,10 @@ class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
     TESTING = False
-    
-    def __init__(self):
-        self.SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
-        if not self.SQLALCHEMY_DATABASE_URI:
-            raise ValueError("DATABASE_URL environment variable not set")
+    # Use PostgreSQL in production
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'postgresql://restaurant_user:restaurant_password@localhost:5432/restaurant_app')
+    WTF_CSRF_ENABLED = True
+    SESSION_COOKIE_SECURE = False  # Set to False for HTTP, True for HTTPS
 
 config = {
     'development': DevelopmentConfig,

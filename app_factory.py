@@ -2,6 +2,7 @@
 import os
 from flask import Flask, Blueprint, render_template
 from flask_login import LoginManager, login_required
+from flask_wtf.csrf import CSRFProtect
 from config import config
 from database.postgres import SessionLocal, init_db
 from database.models import User
@@ -20,6 +21,10 @@ def create_app(config_name=None):
     
     app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
     app.config.from_object(config[config_name])
+    
+    # Initialize Flask-WTF for CSRF protection
+    csrf = CSRFProtect()
+    csrf.init_app(app)
     
     # Initialize Flask-Login
     login_manager = LoginManager()

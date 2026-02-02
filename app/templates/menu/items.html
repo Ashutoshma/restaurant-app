@@ -128,6 +128,21 @@
 </style>
 
 <script>
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return '';
+}
+
+function getCSRFToken() {
+    // Try to get from hidden input first
+    const csrfInput = document.querySelector('input[name="csrf_token"]');
+    if (csrfInput) return csrfInput.value;
+    // Fallback to cookie
+    return getCookie('csrf_token');
+}
+
 function addToCart(restaurantId, itemId, itemName, itemPrice, button) {
     const qtyInput = button.previousElementSibling.previousElementSibling.previousElementSibling;
     const quantity = parseInt(qtyInput.value) || 1;
@@ -135,7 +150,8 @@ function addToCart(restaurantId, itemId, itemName, itemPrice, button) {
     fetch('/cart/add', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
         },
         body: JSON.stringify({
             restaurant_id: restaurantId,

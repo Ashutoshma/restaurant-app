@@ -1,0 +1,11 @@
+runtime: python311
+env: standard
+entrypoint: gunicorn -w 2 -b 0.0.0.0:$PORT wsgi:app
+
+env_variables:
+  FLASK_ENV: "production"
+  DATABASE_URL: "postgresql://postgres:CloudPostgres123!@/restaurant_app?unix_socket_dir=/cloudsql/restaurant-ordering-app-2:us-central1:restaurant-db"
+  SECRET_KEY: "restaurant-ordering-app-super-secret-key-2026"
+
+vpc_access_connector:
+  name: "projects/restaurant-ordering-app-2/locations/us-central1/connectors/restaurant-connector"

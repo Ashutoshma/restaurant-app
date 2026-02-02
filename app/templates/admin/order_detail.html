@@ -107,9 +107,7 @@
                 <hr>
 
                 <h6>Update Status</h6>
-                <form method="POST" action="{{ url_for('admin.update_order_status', order_id=order.id) }}">
-                    <input type="hidden" name="status" id="statusInput">
-                    
+                <div>
                     {% if order.status.value == 'pending' %}
                         <button type="button" class="btn btn-sm btn-info w-100 mb-2" onclick="updateStatus('confirmed')">
                             ✓ Confirm Order
@@ -135,7 +133,7 @@
                     {% else %}
                         <p class="text-muted mb-0">No actions available for this status</p>
                     {% endif %}
-                </form>
+                </div>
 
                 <hr>
 
@@ -155,8 +153,30 @@
 <script>
 function updateStatus(status) {
     if (confirm('Are you sure you want to update the order status to ' + status.toUpperCase() + '?')) {
-        document.getElementById('statusInput').value = status;
-        document.querySelector('form').submit();
+        // Get CSRF token from hidden input
+        const csrfToken = document.getElementById('csrf_token').value;
+        const orderId = {{ order.id }};
+        
+        fetch(`/admin/orders/${orderId}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Order status updated successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Error updating order status: ' + error);
+        });
     }
 }
 </script>
