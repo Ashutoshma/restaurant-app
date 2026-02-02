@@ -7,15 +7,8 @@ import importlib
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Import create_app from app module, avoiding naming conflict with app/ directory
-app_module = importlib.import_module('app', package=None)
-# Get create_app by loading the root app.py directly
-root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-import importlib.util
-spec = importlib.util.spec_from_file_location("root_app", os.path.join(root_path, "app.py"))
-root_app_module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(root_app_module)
-create_app = root_app_module.create_app
+# Import create_app from app_factory
+from app_factory import create_app
 
 from database.postgres import SessionLocal, init_db
 from database.models import User
