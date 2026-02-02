@@ -2,6 +2,10 @@
 import sys
 import os
 import pytest
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -10,6 +14,7 @@ from app_factory import create_app
 from database.postgres import PostgresDB
 from database.models import User, Restaurant
 from app.auth.utils import hash_password
+from flask_login import login_user
 
 
 # Global database instance for all tests
@@ -39,8 +44,8 @@ def app():
 
 @pytest.fixture
 def client(app):
-    """Create a test client for each test"""
-    return app.test_client()
+    """Create a test client that persists cookies across requests"""
+    return app.test_client(use_cookies=True)
 
 
 @pytest.fixture
@@ -56,7 +61,7 @@ def init_db():
 
 
 @pytest.fixture
-def auth_user(client, init_db):
+def auth_user(client, app, init_db):
     """Create and log in a test user"""
     session = init_db.get_session()
     
@@ -64,37 +69,43 @@ def auth_user(client, init_db):
         # Check if user already exists
         existing = session.query(User).filter_by(email='test@example.com').first()
         if existing:
-            session.close()
-            # Just log in
-            client.post('/auth/login', data={
-                'email': 'test@example.com',
-                'password': 'testpass123'
-            }, follow_redirects=True)
-            return existing
+            user_id = existing.id
+        else:
+            # Create test user
+            user = User(
+                email='test@example.com',
+                username='testuser',
+                password_hash=hash_password('testpass123'),
+                first_name='Test',
+                last_name='User'
+            )
+            session.add(user)
+            session.commit()
+            user_id = user.id
         
-        # Create test user
-        user = User(
-            email='test@example.com',
-            username='testuser',
-            password_hash=hash_password('testpass123'),
-            first_name='Test',
-            last_name='User'
-        )
-        session.add(user)
-        session.commit()
-        user_id = user.id
         session.close()
         
-        # Log in the user
-        client.post('/auth/login', data={
+        # Log in using Flask-Login directly
+        session = init_db.get_session()
+        user = session.query(User).filter_by(id=user_id).first()
+        
+        # Push app context and log in
+        with app.test_request_context():
+            login_user(user)
+        
+        session.close()
+        
+        # Also do a POST login to set the session cookie
+        response = client.post('/auth/login', data={
             'email': 'test@example.com',
             'password': 'testpass123'
-        }, follow_redirects=True)
+        }, follow_redirects=False)
         
-        # Return user object with ID
+        # Return user object
         session = init_db.get_session()
         user = session.query(User).filter_by(id=user_id).first()
         session.close()
+        
         return user
     
     except Exception as e:

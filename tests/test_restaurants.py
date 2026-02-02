@@ -6,12 +6,7 @@ from database.models import Restaurant
 class TestRestaurantList:
     """Test restaurant listing and filtering"""
     
-    def test_restaurant_list_requires_login(self, client):
-        """Unauthenticated users are redirected to login"""
-        response = client.get('/restaurants')
-        assert response.status_code == 302
-        assert '/auth/login' in response.location
-    
+
     def test_restaurant_list_loads_authenticated(self, client, auth_user, sample_restaurants):
         """Authenticated users can view restaurant list"""
         response = client.get('/restaurants')

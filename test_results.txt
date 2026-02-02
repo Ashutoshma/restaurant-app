@@ -1,0 +1,34 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.11, pytest-7.4.0, pluggy-1.6.0 -- /Volumes/External/MacDisk/softwares/miniforge3/bin/python
+cachedir: .pytest_cache
+rootdir: /Volumes/External/MacDisk/Desktop/ashutosh-submission/restaurant-ordering-app
+plugins: cov-4.1.0, anyio-3.7.1, flask-1.2.0
+collecting ... collected 66 items / 1 error
+
+==================================== ERRORS ====================================
+_____________________ ERROR collecting tests/test_auth.py ______________________
+E   FileNotFoundError: [Errno 2] No such file or directory: '/Volumes/External/MacDisk/Desktop/ashutosh-submission/restaurant-ordering-app/app.py'
+=============================== warnings summary ===============================
+../../../softwares/miniforge3/lib/python3.12/site-packages/flask_login/login_manager.py:5
+../../../softwares/miniforge3/lib/python3.12/site-packages/flask_login/login_manager.py:5
+  /Volumes/External/MacDisk/softwares/miniforge3/lib/python3.12/site-packages/flask_login/login_manager.py:5: DeprecationWarning: '_request_ctx_stack' is deprecated and will be removed in Flask 2.4.
+    from flask import _request_ctx_stack
+
+../../../softwares/miniforge3/lib/python3.12/site-packages/flask_login/utils.py:7
+../../../softwares/miniforge3/lib/python3.12/site-packages/flask_login/utils.py:7
+  /Volumes/External/MacDisk/softwares/miniforge3/lib/python3.12/site-packages/flask_login/utils.py:7: DeprecationWarning: '_request_ctx_stack' is deprecated and will be removed in Flask 2.4.
+    from flask import _request_ctx_stack
+
+../../../softwares/miniforge3/lib/python3.12/site-packages/sqlalchemy/sql/sqltypes.py:1999
+  /Volumes/External/MacDisk/softwares/miniforge3/lib/python3.12/site-packages/sqlalchemy/sql/sqltypes.py:1999: DeprecationWarning: datetime.datetime.utcfromtimestamp() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.fromtimestamp(timestamp, datetime.UTC).
+    epoch = dt.datetime.utcfromtimestamp(0)
+
+database/models.py:9
+  /Volumes/External/MacDisk/Desktop/ashutosh-submission/restaurant-ordering-app/database/models.py:9: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_auth.py - FileNotFoundError: [Errno 2] No such file or direc...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+========================= 6 warnings, 1 error in 0.08s =========================
